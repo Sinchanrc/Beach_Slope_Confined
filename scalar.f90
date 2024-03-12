@@ -125,7 +125,8 @@ module scalar
             
                 do k=1,dpcell(i,j)%ptot
 
-                if((dpcell(i,j)%plist(k)%tid==3)) then
+                if((dpcell(i,j)%plist(k)%tid==3).and. &
+                (.not.(dpcell(i,j)%plist(k)%dead))) then
 
                 dpcell(i,j)%pplist(k)%cdiff=0.0_dp
 
@@ -159,7 +160,7 @@ module scalar
                         y=>dpcell(i,j)%list(k)%pnh(m)%ppart, &
                         z=>dpcell(i,j)%list(k)%klt)
 
-                    if ((x%tid==3)) then
+                    if ((x%tid==3).and.(.not.(x%dead))) then
 
                         con2=x%con
 
@@ -286,7 +287,8 @@ module scalar
                 do i=sy,ey            
                     do k=1,dpcell(i,j)%ptot
 
-                    if((dpcell(i,j)%plist(k)%tid==3)) then
+                    if((dpcell(i,j)%plist(k)%tid==3).and. &
+                    (.not.(dpcell(i,j)%plist(k)%dead))) then
 
                         ! dpcell(i,j)%plist(k)%density=0.5*(rhomax+rhomin)+dpcell(i,j)%plist(k)%con*(rhomax-rhomin)
                         ! dpcell(i,j)%plist(k)%mass=dpcell(i,j)%plist(k)%density*dpcell(i,j)%plist(k)%ovol

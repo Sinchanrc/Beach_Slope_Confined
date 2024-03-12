@@ -12,11 +12,13 @@ module internal
         implicit none
 
         integer :: i,j,k,m,bfy1
-        integer :: step=0
+        integer :: step=0,dead_ht,dcount=0                                                                                                                                                
 
         real(dp) :: bounlen,bounlen2
 
         bfy1=fpy
+
+        dead_ht=floor(0.22_dp/(2*prrealy/sqrt(por)))
 
         bounlen=fpy*2*prrealy
         bounlen2=open_lhs*2*prrealy
@@ -31,18 +33,28 @@ module internal
 
         !$omp parallel default(shared)
         !Setting up fluid particle positions and pressure
-        !$omp do schedule(runtime) private(i,j) collapse(2) 
+        !$omp do schedule(runtime) private(i,j,dcount) 
             do j =1,fpx
+                dcount=0
             do i=fpy,1,-1
+
+                dcount=dcount+1
+
                 flist(i,j)%y=((brrealy)*((2*bl)-1))+(fpy-i)*2*prrealy/sqrt(por)+prrealy/sqrt(por)
 
                 flist(i,j)%x=((brrealx)*((2*bl)-1))+(j-1)*2*prrealx/sqrt(por)+prrealx/sqrt(por)+domain_shift
 
-            flist(i,j)%vx=entry_vel!*3.0_dp*(((flist(i,j)%y-(brrealy)*(2*bl-1))/bounlen) &
-                            ! -0.5_dp*((flist(i,j)%y-(brrealy)*(2*bl-1))/bounlen)**2)
+            flist(i,j)%vx=entry_vel*fpy/(fpy-2)
             flist(i,j)%vy=0.0_dp
 
                 flist(i,j)%pressure=(-flist(i,j)%y+((brrealy*distfac)*((2*bl)-1))+wc+prrealy/sqrt(por))*rho*abs(g)
+
+                if ((dcount>dead_ht).and.(dcount<=dead_ht+2)) then
+
+                    flist(i,j)%dead=.true.
+                    flist(i,j)%vx=0.0_dp
+
+                end if
 
 
             end do
@@ -107,19 +119,28 @@ module internal
             
         !$omp end single
 
-            !$omp do schedule(runtime) private(i,j) collapse(2) 
+            !$omp do schedule(runtime) private(i,j,dcount)
             do j =1,5
+                dcount=0
                 do i=bfy1,1,-1
+                    
+                    dcount=dcount+1
 
                 flist(i,j)%y=((brrealy)*((2*bl)-1))+(bfy1-i)*2*prrealy/sqrt(por)+prrealy/sqrt(por)
                 flist(i,j)%x=((brrealx)*((2*bl)-1))+(fpx-1)*2*prrealx/sqrt(por)+prrealx/sqrt(por)+domain_shift&
                     +j*2*prrealx/sqrt(por)
 
                 flist(i,j)%buffer=.true.
-                flist(i,j)%vx=entry_vel!*3.0_dp*(((flist(i,j)%y-(brrealy)*(2*bl-1))/bounlen) &
-                            ! -0.5_dp*((flist(i,j)%y-(brrealy)*(2*bl-1))/bounlen)**2)
+                flist(i,j)%vx=entry_vel*fpy/(fpy-2)
                 flist(i,j)%vy=0.0_dp
                 flist(i,j)%pressure=(-flist(i,j)%y+((brrealy*distfac)*((2*bl)-1))+wc+prrealy/sqrt(por))*rho*abs(g)
+
+                if ((dcount>dead_ht).and.(dcount<=dead_ht+2)) then
+
+                    flist(i,j)%dead=.true.
+                    flist(i,j)%vx=0.0_dp
+
+                end if
 
                 if(j>3) then
 
@@ -129,15 +150,22 @@ module internal
 
                 buffer1(i,(j-3))%buffer=.true.                
 
-                buffer1(i,(j-3))%vx=entry_vel!*3.0_dp*(((flist(i,j)%y-(brrealy)*(2*bl-1))/bounlen) &
-                            ! -0.5_dp*((flist(i,j)%y-(brrealy)*(2*bl-1))/bounlen)**2)
+                buffer1(i,(j-3))%vx=entry_vel*fpy/(fpy-2)
                 buffer1(i,(j-3))%vy=0.0_dp
         
                 buffer1(i,(j-3))%pressure=(-flist(i,j)%y+((brrealy*distfac)*((2*bl)-1))+wc+prrealy/sqrt(por))*rho*abs(g)
                 k=k+1
+                if ((dcount>dead_ht).and.(dcount<=dead_ht+2)) then
+
+                    buffer1(i,(j-3))%dead=.true.
+                    buffer1(i,(j-3))%vx=0.0_dp
+
+                end if
 
 
                 end if
+
+
                 end do
             end do
             !$omp end do

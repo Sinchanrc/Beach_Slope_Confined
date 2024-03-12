@@ -512,7 +512,8 @@ module integrator
             t1=0.0_dp
             t2=0.0_dp
             if((dpcell(i,j)%plist(k)%tid==3).and. &
-                (.not.(dpcell(i,j)%plist(k)%buffer))) then
+                (.not.(dpcell(i,j)%plist(k)%buffer)).and. &
+                (.not.(dpcell(i,j)%plist(k)%dead))) then
                 dpcell(i,j)%plist(k)%vxs=0.0_dp
                 dpcell(i,j)%plist(k)%vys=0.0_dp
                 if (dpcell(i,j)%list(k)%count/=0) then
@@ -691,7 +692,8 @@ module integrator
                 
                 do k=1,dpcell(i,j)%ptot
                     if ((dpcell(i,j)%plist(k)%tid==3).and. &
-                    (.not.(dpcell(i,j)%plist(k)%buffer))) then
+                    (.not.(dpcell(i,j)%plist(k)%buffer)).and. &
+                    (.not.(dpcell(i,j)%plist(k)%dead))) then
                     !New fluid particle velocities
                     dpcell(i,j)%plist(k)%vx=0.0_dp
                     dpcell(i,j)%plist(k)%vy=0.0_dp

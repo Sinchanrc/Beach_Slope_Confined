@@ -20,8 +20,8 @@ real(dp),public :: wc=0.650_dp,L=3.11_dp ,H=0.80_dp,&
                     h1,pr=0.0050_dp*0.90_dp,br=0.00490_dp*0.90_dp, & !5.366*0.3 1.2
                     wl=3.10_dp,rho=1000.0_dp,g=-9.810_dp,tl=1e-3,&
                     csh=0.50_dp,rx,ry,lid_driven=0.0010_dp,rhomin=1000.0_dp, &
-                    rhomax,atwood=0.25870_dp,tschmidt=1.0_dp,soill=3.230_dp,soilh=0.80_dp,set_ht=0.20_dp,&
-                    outlet_ht=0.7_dp,coastal_ht=0.450_dp,por=0.380_dp,bulkden=1800_dp,entry_vel=-2.5_dp/(3600*24), &
+                    rhomax,atwood=0.25870_dp,tschmidt=1.0_dp,soill=3.230_dp,soilh=0.80_dp,set_ht=0.10_dp,&
+                    outlet_ht=0.7_dp,coastal_ht=0.550_dp,por=0.380_dp,bulkden=1800_dp,entry_vel=-2.5_dp/(3600*24), &
                     lhs_btm=0.20_dp,rel_den=1.0250_dp,con_fac,rv_buf_l,rv_buf_r
 
 ! dt=time step,t=simulation time
