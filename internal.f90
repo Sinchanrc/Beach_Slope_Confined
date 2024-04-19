@@ -18,7 +18,7 @@ module internal
 
         bfy1=fpy
 
-        dead_ht=floor(0.22_dp/(2*prrealy/sqrt(por)))
+        dead_ht=floor(0.32_dp/(2*prrealy/sqrt(por)))
 
         bounlen=fpy*2*prrealy
         bounlen2=open_lhs*2*prrealy

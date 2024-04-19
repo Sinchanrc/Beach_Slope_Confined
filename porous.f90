@@ -9,6 +9,26 @@ module porous
 
     contains
 
+    pure function vis(oden) result(dmu)
+
+        real(dp),intent(in) :: oden
+        real(dp),parameter :: tem=20.0_dp
+        real(dp) :: dmu,Acn,Bcn,Sp
+
+        Sp=oden-1000.0_dp
+        ! Acn=1.474_dp*(1e-3)+1.5_dp*(1e-5)*tem-3.927_dp*(1e-8)*tem**2
+        ! Bcn=1.073_dp*(1e-5)-8.5_dp*(1e-8)*tem+2.230_dp*(1e-10)*tem**2
+        Acn=0.001652_dp
+        Bcn=0.0000083_dp
+        ! dmu=exp(-0.00379418_dp+(0.604129_dp/(139.18_dp+tem)))*(1e-3)* &
+        !     (1.0_dp + Acn*Sp + Bcn*Sp**2)
+
+        dmu=(1.002_dp+Acn*Sp+Bcn*Sp**2)*0.001_dp
+
+
+
+    end function
+
     subroutine porsearch(list,n,cell1,cell2,cell3,cell4,smln,solidfrac)
         use functions
         implicit none
@@ -181,15 +201,15 @@ module porous
                 ! ! -((Fch*dpcell(i,j)%plist(k)%vy*sqrt(dpcell(i,j)%plist(k)%vx**2+dpcell(i,j)%plist(k)%vy**2)* &
                 ! ! sqrt(lamk)*(1.0_dp-dpcell(i,j)%pplist(k)%porosity))/(sqrt(dpcell(i,j)%pplist(k)%porosity**3)*d50))
 
-                dpcell(i,j)%pplist(k)%resistx=-((mu/dpcell(i,j)%plist(k)%oden)*lamk* &
-                ((1.0_dp-dpcell(i,j)%pplist(k)%porosity)**2)/((dpcell(i,j)%pplist(k)%porosity**3)*(d50**2))) !&
-                ! -((Fch*abs(dpcell(i,j)%plist(k)%vx)* &
-                ! sqrt(lamk)*(1.0_dp-dpcell(i,j)%pplist(k)%porosity))/(sqrt(dpcell(i,j)%pplist(k)%porosity**3)*d50))
+                dpcell(i,j)%pplist(k)%resistx=-((vis(dpcell(i,j)%plist(k)%oden)/dpcell(i,j)%plist(k)%oden)*lamk* &
+                ((1.0_dp-dpcell(i,j)%pplist(k)%porosity)**2)/((dpcell(i,j)%pplist(k)%porosity**3)*(d50**2))) &
+                -((Fch*sqrt(dpcell(i,j)%plist(k)%vx**2+dpcell(i,j)%plist(k)%vy**2)* &
+                sqrt(lamk)*(1.0_dp-dpcell(i,j)%pplist(k)%porosity))/(sqrt(dpcell(i,j)%pplist(k)%porosity**3)*d50))
 
-                dpcell(i,j)%pplist(k)%resisty=-((mu/dpcell(i,j)%plist(k)%oden)*lamk* &
-                ((1.0_dp-dpcell(i,j)%pplist(k)%porosity)**2)/((dpcell(i,j)%pplist(k)%porosity**3)*(d50**2))) !&
-                ! -((Fch*abs(dpcell(i,j)%plist(k)%vy)* &
-                ! sqrt(lamk)*(1.0_dp-dpcell(i,j)%pplist(k)%porosity))/(sqrt(dpcell(i,j)%pplist(k)%porosity**3)*d50))
+                dpcell(i,j)%pplist(k)%resisty=-((vis(dpcell(i,j)%plist(k)%oden)/dpcell(i,j)%plist(k)%oden)*lamk* &
+                ((1.0_dp-dpcell(i,j)%pplist(k)%porosity)**2)/((dpcell(i,j)%pplist(k)%porosity**3)*(d50**2))) &
+                -((Fch*sqrt(dpcell(i,j)%plist(k)%vx**2+dpcell(i,j)%plist(k)%vy**2)* &
+                sqrt(lamk)*(1.0_dp-dpcell(i,j)%pplist(k)%porosity))/(sqrt(dpcell(i,j)%pplist(k)%porosity**3)*d50))
 
 
 

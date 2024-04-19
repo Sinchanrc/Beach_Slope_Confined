@@ -115,7 +115,7 @@ module scalar
 
         integer :: i,j,k,m
         real(dp) :: t1x,t1y,t2,t3,con1,con2,Dxi,Dyi,Dxj,Dyj,vi,vj
-        real(dp),parameter :: al=0.004_dp,at=0.0004_dp,Dm=1e-9,tor=1.0_dp
+        real(dp),parameter :: al=0.006_dp,at=0.0006_dp,Dm=1e-9,tor=1.0_dp
         real(dp) :: ali,ati,alj,atj
 
         !$omp do schedule (runtime) collapse(2) &
@@ -125,8 +125,7 @@ module scalar
             
                 do k=1,dpcell(i,j)%ptot
 
-                if((dpcell(i,j)%plist(k)%tid==3).and. &
-                (.not.(dpcell(i,j)%plist(k)%dead))) then
+                if((dpcell(i,j)%plist(k)%tid==3)) then
 
                 dpcell(i,j)%pplist(k)%cdiff=0.0_dp
 
@@ -160,7 +159,7 @@ module scalar
                         y=>dpcell(i,j)%list(k)%pnh(m)%ppart, &
                         z=>dpcell(i,j)%list(k)%klt)
 
-                    if ((x%tid==3).and.(.not.(x%dead))) then
+                    if ((x%tid==3)) then
 
                         con2=x%con
 
@@ -182,7 +181,7 @@ module scalar
                         Dyj=merge(Dyj,Dm,Dyj>0.0_dp)
                         Dyj=merge(Dyj,0.12_dp*dl**2/dt,Dyj<=0.12_dp*dl**2/dt)
 
-                        if ((dpcell(i,j)%pplist(k)%porosity>=0.5_dp).or.(y%porosity>=0.5_dp)) then
+                        if ((dpcell(i,j)%pplist(k)%porosity>=0.7_dp).or.(y%porosity>=0.7_dp)) then
 
                         if ((dpcell(i,j)%pplist(k)%nut<1e-6).and.(y%nut<1e-6)) then
 

@@ -16,15 +16,18 @@ module integrator
         real(dp) :: dmu,Acn,Bcn,Sp
 
         Sp=oden-1000.0_dp
-        Acn=1.474_dp*(1e-3)+1.5_dp*(1e-5)*tem-3.927_dp*(1e-8)*tem**2
-        Bcn=1.073_dp*(1e-5)-8.5_dp*(1e-8)*tem+2.230_dp*(1e-10)*tem**2
-        dmu=exp(-0.00379418_dp+(0.604129_dp/(139.18_dp+tem)))*(1e-3)* &
-            (1.0_dp + Acn*Sp + Bcn*Sp**2)
+        ! Acn=1.474_dp*(1e-3)+1.5_dp*(1e-5)*tem-3.927_dp*(1e-8)*tem**2
+        ! Bcn=1.073_dp*(1e-5)-8.5_dp*(1e-8)*tem+2.230_dp*(1e-10)*tem**2
+        Acn=0.001652_dp
+        Bcn=0.0000083_dp
+        ! dmu=exp(-0.00379418_dp+(0.604129_dp/(139.18_dp+tem)))*(1e-3)* &
+        !     (1.0_dp + Acn*Sp + Bcn*Sp**2)
+
+        dmu=(1.002_dp+Acn*Sp+Bcn*Sp**2)*0.001_dp
 
 
 
     end function
-
 
     subroutine cellshiftalt
         implicit none  
@@ -455,7 +458,7 @@ module integrator
     subroutine int_vel
         implicit none
 
-        real(dp) :: t1,t2,pvol,p_dist,vart,ps=1.0_dp
+        real(dp) :: t1,t2,pvol,p_dist,vart,ps=1.0_dp,cmu
 
         integer :: i,j,k,m
 
@@ -503,7 +506,7 @@ module integrator
         !$omp end do
 
         ! Non-pressure velocity calculation for fluid particles
-        !$omp do schedule (runtime) private(m,t1,t2,k,i,j,pvol,p_dist,vart) collapse(2)
+        !$omp do schedule (runtime) private(m,t1,t2,k,i,j,pvol,p_dist,vart,cmu) collapse(2)
         do j=sx,ex
             do i=sy,ey            
             
@@ -512,8 +515,7 @@ module integrator
             t1=0.0_dp
             t2=0.0_dp
             if((dpcell(i,j)%plist(k)%tid==3).and. &
-                (.not.(dpcell(i,j)%plist(k)%buffer)).and. &
-                (.not.(dpcell(i,j)%plist(k)%dead))) then
+                (.not.(dpcell(i,j)%plist(k)%buffer))) then
                 dpcell(i,j)%plist(k)%vxs=0.0_dp
                 dpcell(i,j)%plist(k)%vys=0.0_dp
                 if (dpcell(i,j)%list(k)%count/=0) then
@@ -522,6 +524,19 @@ module integrator
                     associate(x=>dpcell(i,j)%list(k)%nh(m)%part, &
                         y=>dpcell(i,j)%list(k)%pnh(m)%ppart, &
                         z=>dpcell(i,j)%list(k)%klt)
+
+                        if (x%tid==3) then
+
+                        cmu=2*vis(dpcell(i,j)%plist(k)%oden)*vis(x%oden)* &
+                        ((dpcell(i,j)%plist(k)%oden**(-1))*x%oden**(-1))/ &
+                        ((vis(dpcell(i,j)%plist(k)%oden)/dpcell(i,j)%plist(k)%oden)+ &
+                        (vis(x%oden)/x%oden))
+
+                        else
+
+                        cmu=vis(dpcell(i,j)%plist(k)%oden)*(dpcell(i,j)%plist(k)%oden**(-1))
+
+                        end if
 
                         if (dpcell(i,j)%plist(k)%free) then
                             vart=dpcell(i,j)%pplist(k)%varts
@@ -551,11 +566,14 @@ module integrator
                         (dpcell(i,j)%pplist(k)%coff(3)*z(1,m)+dpcell(i,j)%pplist(k)%coff(4)* &
                         z(2,m)))*p_dist
 
+                        ! dpcell(i,j)%plist(k)%vxs=dpcell(i,j)%plist(k)%vxs+ &
+                        ! (t1+t2)*((2*(mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)* &
+                        ! (mu*y%porosity/x%density)/ &
+                        ! ((mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)&
+                        ! +(mu*y%porosity/x%density)))+vart) !+vart
+
                         dpcell(i,j)%plist(k)%vxs=dpcell(i,j)%plist(k)%vxs+ &
-                        (t1+t2)*((2*(mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)* &
-                        (mu*y%porosity/x%density)/ &
-                        ((mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)&
-                        +(mu*y%porosity/x%density)))+vart) !+vart
+                        (t1+t2)*(cmu+vart)
 
                         if (x%tid>2) then
 
@@ -591,11 +609,14 @@ module integrator
                         (dpcell(i,j)%pplist(k)%coff(3)*z(1,m)+dpcell(i,j)%pplist(k)%coff(4)* &
                         z(2,m)))*p_dist
 
+                        ! dpcell(i,j)%plist(k)%vys=dpcell(i,j)%plist(k)%vys+ &
+                        ! (t1+t2)*((2*(mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)* &
+                        ! (mu*y%porosity/x%density)/ &
+                        ! ((mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)&
+                        ! +(mu*y%porosity/x%density)))+vart) !+vart
+
                         dpcell(i,j)%plist(k)%vys=dpcell(i,j)%plist(k)%vys+ &
-                        (t1+t2)*((2*(mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)* &
-                        (mu*y%porosity/x%density)/ &
-                        ((mu*dpcell(i,j)%pplist(k)%porosity/dpcell(i,j)%plist(k)%density)&
-                        +(mu*y%porosity/x%density)))+vart) !+vart
+                        (t1+t2)*(cmu+vart)
 
                         if (x%tid>2) then
 
@@ -667,7 +688,9 @@ module integrator
             if ((dpcell(i,j)%plist(k)%buffer)) then
 
                 dpcell(i,j)%plist(k)%vxs=dpcell(i,j)%plist(k)%vx
-                ! dpcell(i,j)%plist(k)%vys=g*dpcell(i,j)%pplist(k)%porosity*dt
+                dpcell(i,j)%plist(k)%vys=merge(0.0_dp,g*dpcell(i,j)%pplist(k)%porosity*dt,&
+                dpcell(i,j)%plist(k)%x<1.6_dp)
+
             end if
 
                 end do
@@ -692,8 +715,7 @@ module integrator
                 
                 do k=1,dpcell(i,j)%ptot
                     if ((dpcell(i,j)%plist(k)%tid==3).and. &
-                    (.not.(dpcell(i,j)%plist(k)%buffer)).and. &
-                    (.not.(dpcell(i,j)%plist(k)%dead))) then
+                    (.not.(dpcell(i,j)%plist(k)%buffer))) then
                     !New fluid particle velocities
                     dpcell(i,j)%plist(k)%vx=0.0_dp
                     dpcell(i,j)%plist(k)%vy=0.0_dp
@@ -707,15 +729,7 @@ module integrator
                         t2=2*dpcell(i,j)%pplist(k)%porosity*y%porosity/ &
                         (y%porosity+dpcell(i,j)%pplist(k)%porosity)
 
-                        ! t1=(dpcell(i,j)%pplist(k)%porosity**2)*(x%mass/x%density)* &
-                        !     (x%pressure-dpcell(i,j)%plist(k)%pressure)* &
-                        !     (dpcell(i,j)%pplist(k)%coff(1)*z(1,m)+dpcell(i,j)%pplist(k)%coff(2)* &
-                        ! z(2,m))/dpcell(i,j)%plist(k)%density
-
-                        ! t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
-                        ! (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
-                        ! (z(1,m)))/dpcell(i,j)%plist(k)%density
-
+                        if (x%tid==3) then
                         t1=2*((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
                         ((x%pressure*dpcell(i,j)%plist(k)%density/dpcell(i,j)%pplist(k)%porosity)+&
                         (dpcell(i,j)%plist(k)%pressure*x%density/y%porosity))* &
@@ -724,18 +738,33 @@ module integrator
                         ((dpcell(i,j)%plist(k)%density/dpcell(i,j)%pplist(k)%porosity)+ &
                         (x%density/y%porosity)))
 
-
-                        dpcell(i,j)%plist(k)%vx=dpcell(i,j)%plist(k)%vx-t1*dt
-
-                        ! t1=(dpcell(i,j)%pplist(k)%porosity**2)*(x%mass/x%density)* &
-                        !     (x%pressure-dpcell(i,j)%plist(k)%pressure)* &
-                        !     (dpcell(i,j)%pplist(k)%coff(3)*z(1,m)+dpcell(i,j)%pplist(k)%coff(4)* &
-                        ! z(2,m))/dpcell(i,j)%plist(k)%density
-
+                        ! t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
+                        ! (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
+                        ! (dpcell(i,j)%pplist(k)%coff(1)*z(1,m)+dpcell(i,j)%pplist(k)%coff(2)* &
+                        ! z(2,m)))/dpcell(i,j)%plist(k)%density
 
                         ! t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
                         ! (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
-                        ! (z(2,m)))/dpcell(i,j)%plist(k)%density
+                        ! (z(1,m)))/dpcell(i,j)%plist(k)%density
+
+
+                        else 
+
+                            t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
+                        (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
+                        (dpcell(i,j)%pplist(k)%coff(1)*z(1,m)+dpcell(i,j)%pplist(k)%coff(2)* &
+                        z(2,m)))/dpcell(i,j)%plist(k)%density
+
+                        ! t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
+                        ! (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
+                        ! (z(1,m)))/dpcell(i,j)%plist(k)%density
+
+                        end if
+
+
+                        dpcell(i,j)%plist(k)%vx=dpcell(i,j)%plist(k)%vx-t1*dt
+
+                        if (x%tid==3) then
 
                         t1=2*((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
                         ((x%pressure*dpcell(i,j)%plist(k)%density/dpcell(i,j)%pplist(k)%porosity)+&
@@ -744,6 +773,28 @@ module integrator
                         z(2,m)))/((dpcell(i,j)%plist(k)%density)* &
                         ((dpcell(i,j)%plist(k)%density/dpcell(i,j)%pplist(k)%porosity)+ &
                         (x%density/y%porosity)))
+
+                        !     t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
+                        ! (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
+                        ! (dpcell(i,j)%pplist(k)%coff(3)*z(1,m)+dpcell(i,j)%pplist(k)%coff(4)* &
+                        ! z(2,m)))/dpcell(i,j)%plist(k)%density
+
+                        ! t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
+                        ! (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
+                        ! (z(2,m)))/dpcell(i,j)%plist(k)%density
+
+                        else 
+
+                        t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
+                        (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
+                        (dpcell(i,j)%pplist(k)%coff(3)*z(1,m)+dpcell(i,j)%pplist(k)%coff(4)* &
+                        z(2,m)))/dpcell(i,j)%plist(k)%density
+
+                        ! t1=((x%mass/x%density)*(dpcell(i,j)%pplist(k)%porosity**2)*&
+                        ! (x%pressure+dpcell(i,j)%plist(k)%pressure)* &
+                        ! (z(2,m)))/dpcell(i,j)%plist(k)%density
+
+                        end if
 
 
                         dpcell(i,j)%plist(k)%vy=dpcell(i,j)%plist(k)%vy-t1*dt
@@ -773,7 +824,19 @@ module integrator
                 end if
             end do
         end do
-        !$omp end do        
+        !$omp end do 
+        
+        !$omp do schedule(runtime) private(i,j) collapse(2)
+        do j=sx,ex 
+            do i=sy,ey
+                if (dpcell(i,j)%ptot/=0) then
+                dpcell(i,j)%maxvel=maxval(abs(dpcell(i,j)%pplist(1:dpcell(i,j)%ptot)%vel))
+                dpcell(i,j)%maxeddy=maxval(abs(dpcell(i,j)%pplist(1:dpcell(i,j)%ptot)%nut))
+                end if
+            end do
+        end do
+        
+        !$omp end do
         
     end subroutine comp_vel
 
@@ -832,19 +895,19 @@ module integrator
         numax=0.0_dp
         !$omp end single
 
-        !$omp do schedule(runtime) private(i,j) collapse(2)
-            do j=sx,ex 
-                do i=sy,ey
-                    if (dpcell(i,j)%ptot/=0) then
-                    dpcell(i,j)%maxvel=maxval(abs(dpcell(i,j)%pplist(1:dpcell(i,j)%ptot)%vel))
-                    dpcell(i,j)%maxeddy=maxval(abs(dpcell(i,j)%pplist(1:dpcell(i,j)%ptot)%nut))
-                    end if
-                    ! umax=max(umax,dpcell(i,j)%maxvel)
-                    ! numax=max(numax,dpcell(i,j)%maxeddy)
-                end do
-            end do
+        ! !$omp do schedule(runtime) private(i,j) collapse(2)
+        !     do j=sx,ex 
+        !         do i=sy,ey
+        !             if (dpcell(i,j)%ptot/=0) then
+        !             dpcell(i,j)%maxvel=maxval(abs(dpcell(i,j)%pplist(1:dpcell(i,j)%ptot)%vel))
+        !             dpcell(i,j)%maxeddy=maxval(abs(dpcell(i,j)%pplist(1:dpcell(i,j)%ptot)%nut))
+        !             end if
+        !             ! umax=max(umax,dpcell(i,j)%maxvel)
+        !             ! numax=max(numax,dpcell(i,j)%maxeddy)
+        !         end do
+        !     end do
             
-        !$omp end do
+        ! !$omp end do
 
         !$omp do schedule(runtime) private(i,j) reduction(max:umax,numax) collapse(2)
             do j=sx,ex 

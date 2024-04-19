@@ -25,7 +25,7 @@ real(dp),public :: wc=0.650_dp,L=3.11_dp ,H=0.80_dp,&
                     lhs_btm=0.20_dp,rel_den=1.0250_dp,con_fac,rv_buf_l,rv_buf_r
 
 ! dt=time step,t=simulation time
-real(dp),public :: dt=0.001,t=0.0_dp,told=0.0_dp,time=2100.0_dp,displaytime=100.0_dp,dtsol=0.0010_dp, &
+real(dp),public :: dt=0.001,t=0.0_dp,told=0.0_dp,time=5220.0_dp,displaytime=100.0_dp,dtsol=0.0010_dp, &
                     ins_1=0.0_dp,ins_2=0.0_dp,time_shift=0.0_dp !0.00001
 
 ! fmass=fluid particle mass,prrealx=half particle spacing x dir,prrealy=half particle spacing y direction
@@ -34,13 +34,13 @@ real(dp),public :: dt=0.001,t=0.0_dp,told=0.0_dp,time=2100.0_dp,displaytime=100.
 real(dp),public :: fmass=0.0_dp,bfdist=0.0_dp,prrealx=0.0_dp,prrealy=0.0_dp,brrealx=0.0_dp,blen=1.0_dp,distfac=1.0_dp, &
                         brrealy=0.0_dp,lam=0.0_dp,mu=0.0010_dp,beta=0.010_dp,sig1=0.20_dp,&
                         sig2=0.20_dp,delt=0.10_dp,maxshift=0.1_dp,alpha=0.010_dp,dl1=0.0_dp,&
-                        solidx=0.0_dp,solidy=0.0_dp,line_grad=15.0_dp,xl,yl,xu,yu,xrcutoff,xlcutoff,&
+                        solidx=0.0_dp,solidy=0.0_dp,line_grad=18.0_dp,xl,yl,xu,yu,xrcutoff,xlcutoff,&
                         ytcutoff,domain_shift
 
 ! r=particle shifting value,lamfs=surface tracking coeffincient,umax=max velocity
 real(dp),public :: r=0.0_dp,maxdivr=2.0_dp, &
                         dl,lamfs=0.80_dp,umax=0.0_dp,ker=0.0_dp,normx,normy,co,t_gam=7, &
-                        pll=1.60_dp,pul=1.80_dp,hfac=4.80_dp,fac2=0.80_dp,numax=0.0_dp !term1=0.0_dp,term2=0.0_dp,
+                        pll=1.60_dp,pul=1.80_dp,hfac=4.880_dp,fac2=0.80_dp,numax=0.0_dp !term1=0.0_dp,term2=0.0_dp,
 
 ! bcor1,bcor2=domain corner points,ref1,ref2=reference points for mirroring interpolation nodes
 ! type(corner) :: bcor1,bcor2,ref1,ref2
