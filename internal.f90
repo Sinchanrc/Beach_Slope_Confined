@@ -18,12 +18,12 @@ module internal
 
         bfy1=fpy
 
-        dead_ht=floor(0.32_dp/(2*prrealy/sqrt(por)))
+        dead_ht=floor(0.42_dp/(2*prrealy/sqrt(por)))
 
         bounlen=fpy*2*prrealy
         bounlen2=open_lhs*2*prrealy
 
-        ins_1=(4*prrealx/sqrt(por))/abs(entry_vel/0.381_dp)
+        ins_1=(4*prrealx/sqrt(por))/abs(entry_vel/0.387_dp)
         ins_2=4*prrealx/((bounlen/bounlen2)*abs(entry_vel))
 
         rv_buf_r=((brrealx)*((2*bl)-1))+(fpx-1)*2*prrealx/sqrt(por)+prrealx/sqrt(por)+domain_shift&

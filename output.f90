@@ -213,7 +213,8 @@ module output
                 dpcell(i,j)%plist(cout)%y,dpcell(i,j)%plist(cout)%pressure,dpcell(i,j)%plist(cout)%vx &
                 ,dpcell(i,j)%plist(cout)%vy,(dpcell(i,j)%plist(cout)%con+0.50_dp)
 
-                elseif ((dpcell(i,j)%plist(cout)%tid==3).and.((dpcell(i,j)%plist(cout)%dead))) then
+                elseif ((dpcell(i,j)%plist(cout)%tid==3).and.((dpcell(i,j)%plist(cout)%dead)) &
+                    .and.(.not.(dpcell(i,j)%plist(cout)%buffer))) then
 
                     write(15,'(F10.3,1X,F10.3,1X,F10.3,1X,ES10.3,1X,ES10.3,1X,F10.5)')dpcell(i,j)%plist(cout)%x,&
                     dpcell(i,j)%plist(cout)%y,dpcell(i,j)%plist(cout)%pressure,dpcell(i,j)%plist(cout)%vx &
@@ -231,5 +232,53 @@ module output
     
         
     end subroutine combined
+
+    subroutine combined20()
+        implicit none
+
+        integer :: i,j,k,m
+        character(len=70):: fluid,buffer3,deadp
+
+        write(fluid,'("fluid_",i0,".txt")')(2120)
+        write(deadp,'("dead_",i0,".txt")')(2120)
+        write(buffer3,'("buffer_",i0,".txt")')(2120)
+        open(11,file='fluid/'//fluid,status='replace',action='write')
+        open(14,file='buffer/'//buffer3,status='replace',action='write')
+        open(15,file='fluid/'//deadp,status='replace',action='write')
+
+        do j=sx,ex
+            do i=sy,ey
+                do cout=1,dpcell(i,j)%ptot
+                if ((dpcell(i,j)%plist(cout)%tid==3).and.(.not.(dpcell(i,j)%plist(cout)%buffer)).and. &
+                (.not.(dpcell(i,j)%plist(cout)%dead))) then
+                write(11,'(F10.3,1X,F10.3,1X,F10.3,1X,ES10.3,1X,ES10.3,1X,F10.5)')dpcell(i,j)%plist(cout)%x,&
+                dpcell(i,j)%plist(cout)%y,dpcell(i,j)%plist(cout)%pressure,dpcell(i,j)%plist(cout)%vx &
+                ,dpcell(i,j)%plist(cout)%vy,(dpcell(i,j)%plist(cout)%con+0.50_dp)
+
+                elseif ((dpcell(i,j)%plist(cout)%tid==3).and.(dpcell(i,j)%plist(cout)%buffer).and. &
+                    (.not.(dpcell(i,j)%plist(cout)%dead))) then
+                write(14,'(F10.3,1X,F10.3,1X,F10.3,1X,ES10.3,1X,ES10.3,1X,F10.5)')dpcell(i,j)%plist(cout)%x,&
+                dpcell(i,j)%plist(cout)%y,dpcell(i,j)%plist(cout)%pressure,dpcell(i,j)%plist(cout)%vx &
+                ,dpcell(i,j)%plist(cout)%vy,(dpcell(i,j)%plist(cout)%con+0.50_dp)
+
+                elseif ((dpcell(i,j)%plist(cout)%tid==3).and.((dpcell(i,j)%plist(cout)%dead)) &
+                    .and.(.not.(dpcell(i,j)%plist(cout)%buffer))) then
+
+                    write(15,'(F10.3,1X,F10.3,1X,F10.3,1X,ES10.3,1X,ES10.3,1X,F10.5)')dpcell(i,j)%plist(cout)%x,&
+                    dpcell(i,j)%plist(cout)%y,dpcell(i,j)%plist(cout)%pressure,dpcell(i,j)%plist(cout)%vx &
+                    ,dpcell(i,j)%plist(cout)%vy,(dpcell(i,j)%plist(cout)%con+0.50_dp)
+
+                end if
+                end do
+
+            end do
+        end do
+
+        close(11)
+        close(14)
+        close(15)
+    
+        
+    end subroutine combined20
     
 end module output
