@@ -3,8 +3,8 @@
 ulimit -s unlimited
 
 #EXPORTING OPENMP ENVIRONMENT VARIABLES
-export OMP_NUM_THREADS=6
-export MKL_NUM_THREADS=6
+export OMP_NUM_THREADS=20
+export MKL_NUM_THREADS=20
 export OMP_SCHEDULE="dynamic"
 # export OMP_STACKSIZE=16M
 # export OMP_PROC_BIND="close"
@@ -20,12 +20,12 @@ export OMP_SCHEDULE="dynamic"
 #GNU COMPILERS
 
 gfortran-12 -ffree-line-length-512 -Ofast -fopenmp -march=native -mtune=native \
--mavx2 -c -funroll-loops -flto=auto -ftree-vectorize -fstack-arrays \
+-mavx2 -c -funroll-loops -flto=auto -ftree-vectorize -fstack-arrays -finline-functions \
 -m64  -I"${MKLROOT}/include" \
 initialize.f90
 
 gfortran-12 -ffree-line-length-512 -Ofast -fopenmp -march=native -mtune=native \
--mavx2 -std=f2008 -c -funroll-loops -flto=auto -ftree-vectorize -fstack-arrays \
+-mavx2 -std=f2008 -c -funroll-loops -flto=auto -ftree-vectorize -fstack-arrays -finline-functions \
 particle.f90 interactions.f90 transfer.f90 domain.f90 kernel.f90 functions.f90 \
 search.f90 gradient.f90 setup.f90 solver.f90 boundary.f90 output.f90 internal.f90 \
 memory.f90 isph.f90 integrator.f90 turbulence.f90 part_shift.f90 \
@@ -54,7 +54,7 @@ scalar.f90 porous.f90
 
 
 gfortran-12 -ffree-line-length-512 -Ofast -fopenmp -march=native -mtune=native \
--mavx2 -std=f2008 -funroll-loops -flto=auto -ftree-vectorize -fstack-arrays \
+-mavx2 -std=f2008 -funroll-loops -flto=auto -ftree-vectorize -fstack-arrays -finline-functions \
 particle.o interactions.o transfer.o domain.o initialize.o kernel.o functions.o \
 search.o gradient.o setup.o solver.o boundary.o output.o internal.o \
 memory.o isph.o integrator.o turbulence.o part_shift.o \

@@ -27,7 +27,8 @@ module part_shift
             do k=1,dpcell(i,j)%ptot
 
                 if ((dpcell(i,j)%plist(k)%tid==3).and. &
-                (.not.(dpcell(i,j)%plist(k)%buffer))) then
+                (.not.(dpcell(i,j)%plist(k)%buffer)) &
+                .and.(.not.(dpcell(i,j)%plist(k)%dead))) then
 
                 xs=0.0_dp
                 ys=0.0_dp

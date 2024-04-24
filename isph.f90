@@ -26,7 +26,8 @@ module isph
                 
                     do k=1,dpcell(i,j)%ptot
 
-                    if (dpcell(i,j)%plist(k)%tid==3) then
+                    if ((dpcell(i,j)%plist(k)%tid==3) &
+                    .and.(.not.(dpcell(i,j)%plist(k)%dead))) then
                     dpcell(i,j)%plist(k)%xs=dpcell(i,j)%plist(k)%x
                     dpcell(i,j)%plist(k)%x=dpcell(i,j)%plist(k)%x+(dt* &
                     dpcell(i,j)%plist(k)%vx/dpcell(i,j)%pplist(k)%porosity)

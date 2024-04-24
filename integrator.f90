@@ -514,8 +514,10 @@ module integrator
 
             t1=0.0_dp
             t2=0.0_dp
+
             if((dpcell(i,j)%plist(k)%tid==3).and. &
-                (.not.(dpcell(i,j)%plist(k)%buffer))) then
+                (.not.(dpcell(i,j)%plist(k)%buffer)).and. &
+                (.not.(dpcell(i,j)%plist(k)%dead))) then
                 dpcell(i,j)%plist(k)%vxs=0.0_dp
                 dpcell(i,j)%plist(k)%vys=0.0_dp
                 if (dpcell(i,j)%list(k)%count/=0) then
@@ -685,11 +687,21 @@ module integrator
 
             end if
 
-            if ((dpcell(i,j)%plist(k)%buffer)) then
+            if ((dpcell(i,j)%plist(k)%buffer).or. &
+            (dpcell(i,j)%plist(k)%dead)) then
 
                 dpcell(i,j)%plist(k)%vxs=dpcell(i,j)%plist(k)%vx
-                dpcell(i,j)%plist(k)%vys=merge(0.0_dp,g*dpcell(i,j)%pplist(k)%porosity*dt,&
-                dpcell(i,j)%plist(k)%x<1.6_dp)
+                ! dpcell(i,j)%plist(k)%vys=merge(0.0_dp,g*dpcell(i,j)%pplist(k)%porosity*dt,&
+                ! dpcell(i,j)%plist(k)%x<1.6_dp)
+                dpcell(i,j)%plist(k)%vys=g*dpcell(i,j)%pplist(k)%porosity*dt
+
+            end if
+
+            if ((dpcell(i,j)%plist(k)%dead).and. &
+                    (.not.(dpcell(i,j)%plist(k)%buffer))) then
+
+                dpcell(i,j)%plist(k)%vxs=0.0_dp
+
 
             end if
 
@@ -715,7 +727,8 @@ module integrator
                 
                 do k=1,dpcell(i,j)%ptot
                     if ((dpcell(i,j)%plist(k)%tid==3).and. &
-                    (.not.(dpcell(i,j)%plist(k)%buffer))) then
+                    (.not.(dpcell(i,j)%plist(k)%buffer)) &
+                    .and.(.not.(dpcell(i,j)%plist(k)%dead))) then
                     !New fluid particle velocities
                     dpcell(i,j)%plist(k)%vx=0.0_dp
                     dpcell(i,j)%plist(k)%vy=0.0_dp
@@ -819,6 +832,17 @@ module integrator
                         dpcell(i,j)%plist(k)%vy=0.0_dp
                     end if
 
+                    if ((dpcell(i,j)%plist(k)%dead).and. &
+                    (.not.(dpcell(i,j)%plist(k)%buffer))) then
+
+                        dpcell(i,j)%plist(k)%vx=0.0_dp
+                        dpcell(i,j)%plist(k)%vy=0.0_dp
+                        dpcell(i,j)%plist(k)%vxs=0.0_dp
+                        dpcell(i,j)%plist(k)%vys=0.0_dp
+        
+        
+                    end if
+
                 end do
 
                 end if
@@ -852,7 +876,8 @@ module integrator
             do i=sy,ey
                 do k=1,dpcell(i,j)%ptot
 
-                    if (dpcell(i,j)%plist(k)%tid==3) then
+                    if ((dpcell(i,j)%plist(k)%tid==3) &
+                    .and.(.not.(dpcell(i,j)%plist(k)%dead))) then
 
                     dpcell(i,j)%plist(k)%x=(dpcell(i,j)%plist(k)%x+ &
                     dpcell(i,j)%plist(k)%xs+dt*dpcell(i,j)%plist(k)%vx/dpcell(i,j)%pplist(k)%porosity)/2.0_dp

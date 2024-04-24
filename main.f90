@@ -196,87 +196,87 @@ program dam_break
     iter2=1
     t=0.0_dp
 
-    do while(t<time)
+    ! do while(t<time)
 
-        told=t
-        t=t+dt
+    !     told=t
+    !     t=t+dt
         
-        ! if (dtsol>=dt) then
-        ! !$omp parallel default(shared)
-        ! call scalart
-        ! call scalarupdate(dt)
-        ! !$omp end parallel
-        ! else
-        do j1=1,solsteps
-        !$omp parallel default(shared)
-        call scalart
-        call scalarupdate(dtsol)
-        !$omp end parallel
-        end do
-        ! end if
+    !     ! if (dtsol>=dt) then
+    !     ! !$omp parallel default(shared)
+    !     ! call scalart
+    !     ! call scalarupdate(dt)
+    !     ! !$omp end parallel
+    !     ! else
+    !     do j1=1,solsteps
+    !     !$omp parallel default(shared)
+    !     call scalart
+    !     call scalarupdate(dtsol)
+    !     !$omp end parallel
+    !     end do
+    !     ! end if
 
-        if(((told+time_shift)<iter1*ins_1).and. &
-            (t+time_shift)>=iter1*ins_1) then
+    !     if(((told+time_shift)<iter1*ins_1).and. &
+    !         (t+time_shift)>=iter1*ins_1) then
 
-            call remove_buffer1
-            call insert_buffer1
+    !         call remove_buffer1
+    !         call insert_buffer1
 
-            iter1=iter1+1
+    !         iter1=iter1+1
 
-        end if
+    !     end if
 
-        if(((told+time_shift)<iter2*ins_2).and. &
-            (t+time_shift)>=iter2*ins_2) then
+    !     if(((told+time_shift)<iter2*ins_2).and. &
+    !         (t+time_shift)>=iter2*ins_2) then
 
-            call remove_buffer2
-            call insert_buffer2(rel_den)
+    !         call remove_buffer2
+    !         call insert_buffer2(rel_den)
 
-            iter2=iter2+1
+    !         iter2=iter2+1
 
-        end if
+    !     end if
 
-        !$omp parallel default(shared)
+    !     !$omp parallel default(shared)
 
-        call projection 
-        call cellshift
-        call resetid
-        call neighbour
-        call effpor
-        call eddyvis
-        call int_vel
-        !$omp end parallel
-        call ppesolve
+    !     call projection 
+    !     call cellshift
+    !     call resetid
+    !     call neighbour
+    !     call effpor
+    !     call eddyvis
+    !     call int_vel
+    !     !$omp end parallel
+    !     call ppesolve
     
-        !$omp parallel default(shared)
-        call comp_vel        
-        call comp_pos
-        call cellshiftalt
-        call neighbour
-        call freesurf
-        call effpor
-        call opt2_shift
-        call densityupdate
-        call timestep
-        call eddyvis 
-        !$omp end parallel
+    !     !$omp parallel default(shared)
+    !     call comp_vel        
+    !     call comp_pos
+    !     call cellshiftalt
+    !     call neighbour
+    !     call freesurf
+    !     call effpor
+    !     call opt2_shift
+    !     call densityupdate
+    !     call timestep
+    !     call eddyvis 
+    !     !$omp end parallel
 
-        if ((told<iter*displaytime).and. &
-        (t>=iter*displaytime)) then
+    !     if ((told<iter*displaytime).and. &
+    !     (t>=iter*displaytime)) then
 
-        call combined
-        iter=iter+1
-        end if
+    !     call combined
+    !     iter=iter+1
+    !     end if
 
-        if ((flag==1).and.(told<2120.0_dp).and. &
-        (t>=2120.0_dp)) then
+    !     if ((flag==1).and.(told<2120.0_dp).and. &
+    !     (t>=2120.0_dp)) then
 
-            call combined20
-            flag=0
-        end if
+    !         call combined20
+    !         flag=0
+    !     end if
 
 
 
-    end do
+    ! end do
 
     call combined
     
