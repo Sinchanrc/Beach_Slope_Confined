@@ -352,7 +352,7 @@ module internal
                 do i=open_lhs,1,-1
                     flist(i,j)%y=2*bny*brrealy-brrealy+prrealy+(open_lhs-i)*2*prrealy
                     flist(i,j)%x=(j-1)*2*prrealx+brrealx
-                flist(i,j)%vx=0.0_dp!(-bounlen/bounlen2)*entry_vel!*3.0_dp*(((flist(i,j)%y-(brrealy)*(2*bny-1))/bounlen2) &
+                flist(i,j)%vx=(-bounlen/bounlen2)*entry_vel!*3.0_dp*(((flist(i,j)%y-(brrealy)*(2*bny-1))/bounlen2) &
                                 ! -0.5_dp*((flist(i,j)%y-(brrealy)*(2*bny-1))/bounlen2)**2)
                 flist(i,j)%vy=0.0_dp
 
@@ -364,7 +364,7 @@ module internal
                     buffer2(i,j)%y=2*bny*brrealy-brrealy+prrealy+(open_lhs-i)*2*prrealy
                     buffer2(i,j)%x=(j-1)*2*prrealx+brrealx
 
-                buffer2(i,j)%vx=0.0_dp!(-bounlen/bounlen2)*entry_vel!*3.0_dp*(((flist(i,j)%y-(brrealy)*(2*bny-1))/bounlen2) &
+                buffer2(i,j)%vx=(-bounlen/bounlen2)*entry_vel!*3.0_dp*(((flist(i,j)%y-(brrealy)*(2*bny-1))/bounlen2) &
                                 ! -0.5_dp*((flist(i,j)%y-(brrealy)*(2*bny-1))/bounlen2)**2)
                 buffer2(i,j)%vy=0.0_dp
 
