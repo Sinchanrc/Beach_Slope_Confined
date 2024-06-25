@@ -20,8 +20,8 @@ real(dp),public :: wc=0.650_dp,L=3.11_dp ,H=0.80_dp,&
                     h1,pr=0.0050_dp*0.90_dp,br=0.00490_dp*0.90_dp, & !5.366*0.3 1.2
                     wl=3.10_dp,rho=1000.0_dp,g=-9.810_dp,tl=1e-3,&
                     csh=0.50_dp,rx,ry,lid_driven=0.0010_dp,rhomin=1000.0_dp, &
-                    rhomax,atwood=0.25870_dp,tschmidt=1.0_dp,soill=3.230_dp,soilh=0.80_dp,set_ht=0.20_dp,&
-                    outlet_ht=0.7_dp,coastal_ht=0.450_dp,por=0.380_dp,bulkden=1800_dp,entry_vel=-2.5_dp/(3600*24), &
+                    rhomax,atwood=0.25870_dp,tschmidt=1.0_dp,soill=3.230_dp,soilh=0.80_dp,set_ht=0.10_dp,&
+                    outlet_ht=0.7_dp,coastal_ht=0.550_dp,por=0.380_dp,bulkden=1800_dp,entry_vel=-2.5_dp/(3600*24), &
                     lhs_btm=0.20_dp,rel_den=1.0250_dp,con_fac,rv_buf_l,rv_buf_r
 
 ! dt=time step,t=simulation time
@@ -34,7 +34,7 @@ real(dp),public :: dt=0.001,t=0.0_dp,told=0.0_dp,time=5220.0_dp,displaytime=100.
 real(dp),public :: fmass=0.0_dp,bfdist=0.0_dp,prrealx=0.0_dp,prrealy=0.0_dp,brrealx=0.0_dp,blen=1.0_dp,distfac=1.0_dp, &
                         brrealy=0.0_dp,lam=0.0_dp,mu=0.0010_dp,beta=0.010_dp,sig1=0.20_dp,&
                         sig2=0.20_dp,delt=0.10_dp,maxshift=0.1_dp,alpha=0.010_dp,dl1=0.0_dp,&
-                        solidx=0.0_dp,solidy=0.0_dp,line_grad=16.690_dp,xl,yl,xu,yu,xrcutoff,xlcutoff,&
+                        solidx=0.0_dp,solidy=0.0_dp,line_grad=15.0_dp,xl,yl,xu,yu,xrcutoff,xlcutoff,&
                         ytcutoff,domain_shift
 
 ! r=particle shifting value,lamfs=surface tracking coeffincient,umax=max velocity

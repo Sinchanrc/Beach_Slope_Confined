@@ -687,8 +687,8 @@ module integrator
 
             end if
 
-            if ((dpcell(i,j)%plist(k)%buffer).or. &
-            (dpcell(i,j)%plist(k)%dead)) then
+
+            if ((dpcell(i,j)%plist(k)%buffer)) then
 
                 dpcell(i,j)%plist(k)%vxs=dpcell(i,j)%plist(k)%vx
                 ! dpcell(i,j)%plist(k)%vys=merge(0.0_dp,g*dpcell(i,j)%pplist(k)%porosity*dt,&
@@ -697,13 +697,13 @@ module integrator
 
             end if
 
-            if ((dpcell(i,j)%plist(k)%dead).and. &
-                    (.not.(dpcell(i,j)%plist(k)%buffer))) then
+            ! if ((dpcell(i,j)%plist(k)%dead).and. &
+            !         (.not.(dpcell(i,j)%plist(k)%buffer))) then
 
-                dpcell(i,j)%plist(k)%vxs=0.0_dp
+            !     dpcell(i,j)%plist(k)%vxs=0.0_dp
+            !     dpcell(i,j)%plist(k)%vys=0.0_dp
 
-
-            end if
+            ! end if
 
                 end do
             end do

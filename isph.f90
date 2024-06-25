@@ -178,10 +178,12 @@ module isph
                             ! if (x%tid/=4) then
                         
 
-                            if (dpcell(i,j)%plist(k)%free) then
+                            if ((dpcell(i,j)%plist(k)%free).and.(x%tid==3)) then
 
-                                lamp=(1.0_dp+x%oden/(rho*rel_den))**(-1)
+                                lamp=(1.0_dp+x%oden/(rho*rel_den))!**(-1)
                                 ! lamp=0.50_dp
+
+
 
                             ! elseif((pll<dpcell(i,j)%pplist(k)%gradvx).and.(dpcell(i,j)%pplist(k)%gradvx<pul)) then
 
@@ -224,7 +226,7 @@ module isph
                                 ! fmatrix(pos)%val(m)=(-(t1+t2))*lamp
                                 ! fmatrix(pos)%col(m)=x%matid
 
-                                fmatrix(pos)%val(ins_pt)=(-(t1+t2))*lamp
+                                fmatrix(pos)%val(ins_pt)=(-(t1+t2))!*lamp
                                 fmatrix(pos)%col(ins_pt)=x%matid
 
                                 ! else 
@@ -233,7 +235,7 @@ module isph
                                 ! end if
 
                                 ! fmatrix(pos)%val(num+1)=fmatrix(pos)%val(num+1)+(t1+t2)
-                                dia_term=dia_term+(t1+t2)
+                                dia_term=dia_term+(t1+t2)*lamp
 
 
                                 if (x%tid==3) then
@@ -265,7 +267,7 @@ module isph
 
                                 end if
 
-                                fvec(pos)=fvec(pos)+(t1+t2)*lamp/real(dt,dp) !lamp
+                                fvec(pos)=fvec(pos)+(t1+t2)/real(dt,dp) !lamp
 
 
 
@@ -305,7 +307,7 @@ module isph
 
                                     if (x%free) then
 
-                                        lamp2=(1.0_dp+dpcell(i,j)%plist(k)%oden/(rho*rel_den))**(-1)
+                                        lamp2=1.0_dp!(1.0_dp+dpcell(i,j)%plist(k)%oden/(rho*rel_den))!**(-1)
                                         ! lamp2=0.50_dp
         
                                     ! elseif((pll<y%gradvx).and.(y%gradvx<pul)) then
@@ -372,7 +374,7 @@ module isph
 
                                     ! if (.not.(x%buffer)) then
 
-                                    fvec(pos)=fvec(pos)+(t1+t2)*lamp2/real(dt,dp)  !lamp
+                                    fvec(pos)=fvec(pos)+(t1+t2)/real(dt,dp)  !lamp
 
                                     ! end if
 

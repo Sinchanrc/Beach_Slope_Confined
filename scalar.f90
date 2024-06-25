@@ -115,7 +115,7 @@ module scalar
 
         integer :: i,j,k,m
         real(dp) :: t1x,t1y,t2,t3,con1,con2,Dxi,Dyi,Dxj,Dyj,vi,vj
-        real(dp),parameter :: al=0.006_dp,at=0.0006_dp,Dm=1e-9,tor=1.0_dp
+        real(dp),parameter :: al=0.0025_dp,at=0.00025_dp,Dm=1e-9,tor=1.0_dp
         real(dp) :: ali,ati,alj,atj
 
         !$omp do schedule (runtime) collapse(2) &
@@ -181,7 +181,7 @@ module scalar
                         Dyj=merge(Dyj,Dm,Dyj>0.0_dp)
                         Dyj=merge(Dyj,0.12_dp*dl**2/dt,Dyj<=0.12_dp*dl**2/dt)
 
-                        if ((dpcell(i,j)%pplist(k)%porosity>=0.7_dp).or.(y%porosity>=0.7_dp)) then
+                        if ((dpcell(i,j)%pplist(k)%porosity>=0.8_dp).or.(y%porosity>=0.8_dp)) then
 
                         if ((dpcell(i,j)%pplist(k)%nut<1e-6).and.(y%nut<1e-6)) then
 
@@ -205,8 +205,7 @@ module scalar
 
                         ! t1=Dm
 
-                        t2=2*dpcell(i,j)%pplist(k)%porosity*y%porosity/&
-                            (dpcell(i,j)%pplist(k)%porosity+y%porosity)
+                        t2=1.0_dp
                         
                         t3=(dpcell(i,j)%plist(k)%ovol)*(dpcell(i,j)%pplist(k)%porosity+y%porosity)/&
                         (dpcell(i,j)%pplist(k)%porosity*y%porosity)

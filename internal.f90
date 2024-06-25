@@ -18,7 +18,7 @@ module internal
 
         bfy1=fpy
 
-        dead_ht=floor(0.42_dp/(2*prrealy/sqrt(por)))
+        dead_ht=ceiling(0.3_dp/(2*prrealy/sqrt(por)))
 
         bounlen=fpy*2*prrealy
         bounlen2=open_lhs*2*prrealy
@@ -44,7 +44,7 @@ module internal
 
                 flist(i,j)%x=((brrealx)*((2*bl)-1))+(j-1)*2*prrealx/sqrt(por)+prrealx/sqrt(por)+domain_shift
 
-            flist(i,j)%vx=entry_vel*fpy/(fpy-2)
+            flist(i,j)%vx=entry_vel*fpy/(fpy)
             flist(i,j)%vy=0.0_dp
 
                 flist(i,j)%pressure=(-flist(i,j)%y+((brrealy*distfac)*((2*bl)-1))+wc+prrealy/sqrt(por))*rho*abs(g)
